@@ -2,7 +2,7 @@
 
 class Main {
 public:
-    // Uncomment if needed: static const std::string name = "Nahom";
+    // some comments goes here
 
     static int add(int a, int b) {
         return a + b;

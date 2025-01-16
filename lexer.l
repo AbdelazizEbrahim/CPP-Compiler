@@ -4,7 +4,7 @@
 %}
 
 %%
-"#".*           ; 
+"#"                  { return HASH; }; 
 "int"                { printf("Token: INT\n"); return INT; }
 "float"              { return FLOAT; }
 "double"             { return DOUBLE; }
