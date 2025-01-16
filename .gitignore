@@ -3,3 +3,4 @@ main
 y.output
 *.h
 compiler
+.vscode

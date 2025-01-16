@@ -1,37 +1,35 @@
-# Compiler and tools
-CC = gcc
-LEX = flex
-YACC = yacc
-
-# Flags
+# Compiler and flags
+CC = g++
 CFLAGS = -g -Wall
-YACC_FLAGS = -d
-LEX_FLAGS = 
+LEX = flex
+BISON = bison
+BISONFLAGS = -d
 
 # Files
 LEX_FILE = lexer.l
-YACC_FILE = parser.y
-TARGET = compiler
-
-# Generated files
+PARSER_FILE = parser.y
 LEX_OUTPUT = lex.yy.c
-YACC_OUTPUT = y.tab.c y.tab.h
+PARSER_OUTPUT_C = parser.tab.c
+PARSER_OUTPUT_H = parser.tab.h
+EXECUTABLE = compiler
 
-# Default rule
-all: $(TARGET)
+# Targets
+all: $(EXECUTABLE)
 
-# Compile the parser first (yacc/bison)
-$(YACC_OUTPUT): $(YACC_FILE)
-	$(YACC) $(YACC_FLAGS) $(YACC_FILE)
+$(EXECUTABLE): $(LEX_OUTPUT) $(PARSER_OUTPUT_C) $(PARSER_OUTPUT_H)
+	$(CC) $(CFLAGS) $(LEX_OUTPUT) $(PARSER_OUTPUT_C) -o $(EXECUTABLE) -lfl
 
-# Compile the lexer second (flex)
 $(LEX_OUTPUT): $(LEX_FILE)
 	$(LEX) $(LEX_FILE)
 
-# Compile the final program
-$(TARGET): $(YACC_OUTPUT) $(LEX_OUTPUT)
-	$(CC) $(CFLAGS) $(LEX_OUTPUT) y.tab.c -o $(TARGET) -lfl
+$(PARSER_OUTPUT_C) $(PARSER_OUTPUT_H): $(PARSER_FILE)
+	$(BISON) $(BISONFLAGS) $(PARSER_FILE)
 
-# Clean rule to remove generated files
 clean:
-	rm -f $(TARGET) $(LEX_OUTPUT) $(YACC_OUTPUT)
+	rm -f $(LEX_OUTPUT) $(PARSER_OUTPUT_C) $(PARSER_OUTPUT_H) $(EXECUTABLE)
+
+# Optional: Add a run command to test the program
+run: $(EXECUTABLE)
+	./$(EXECUTABLE) input.cpp
+
+.PHONY: all clean run

@@ -1,6 +1,9 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include "parser.tab.h"
 
 extern int yylineno;
 extern int yylval;
@@ -10,14 +13,16 @@ void yyerror(const char *s);
 int yylex();
 %}
 
-%token INT FLOAT DOUBLE BOOL CHAR VOID
+%token INT FLOAT DOUBLE BOOLEAN CHAR STRING VOID
 %token IF ELSE WHILE FOR BREAK CONTINUE RETURN
-%token CLASS STRUCT PUBLIC PRIVATE PROTECTED NEW DELETE
+%token TRY CATCH CLASS PUBLIC PRIVATE PROTECTED NEW STATIC
 %token IDENTIFIER NUMBER FLOAT_LITERAL STRING_LITERAL CHAR_LITERAL
 %token PLUS MINUS MULT DIV MOD
 %token EQ NEQ GT LT GTE LTE ASSIGN
 %token AND OR NOT
-%token SEMICOLON COMMA DOT SCOPE LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET HASH
+%token SEMICOLON COMMA DOT LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET
+%token INCLUDE STREAM INSERTION EXTRACTION ENDL
+%token PREPROCESSOR_DIRECTIVE NAMESPACE COUT CIN INSERTION_OPERATOR EXTRACTION_OPERATOR SCOPE_RESOLUTION
 
 %left OR
 %left AND
@@ -26,17 +31,28 @@ int yylex();
 %left PLUS MINUS
 %left MULT DIV MOD
 %right NOT
+%right UMINUS
 
 %%
 
 program:
-    program class_declaration
+    program include_directive
+    | program class_declaration
+    | program function_definition
+    | include_directive
     | class_declaration
+    | function_definition
+    | PREPROCESSOR_DIRECTIVE program
+    | NAMESPACE IDENTIFIER ';' program
+    | statement program
+    ;
+
+include_directive:
+    INCLUDE STRING_LITERAL
     ;
 
 class_declaration:
     access_modifier CLASS IDENTIFIER LBRACE class_body RBRACE
-    | access_modifier STRUCT IDENTIFIER LBRACE class_body RBRACE
     ;
 
 access_modifier:
@@ -56,17 +72,22 @@ member_declaration:
     | method_declaration
     ;
 
+function_definition:
+    type IDENTIFIER LPAREN parameter_list RPAREN block
+    ;
+
 variable_declaration:
     static_modifier type IDENTIFIER SEMICOLON
     | static_modifier type IDENTIFIER ASSIGN expression SEMICOLON
     ;
 
 static_modifier:
-    /* empty */ // No explicit 'static' modifier in C++ class variables
+    STATIC
+    | /* empty */
     ;
 
 type:
-    INT | FLOAT | DOUBLE | BOOL | CHAR | VOID | type LBRACKET RBRACKET
+    INT | FLOAT | DOUBLE | BOOLEAN | CHAR | STRING | VOID | type LBRACKET RBRACKET
     ;
 
 method_declaration:
@@ -102,7 +123,10 @@ statement:
     | break_statement
     | continue_statement
     | method_call_statement
+    | stream_statement
     | block
+    | COUT INSERTION_OPERATOR IDENTIFIER ';'
+    | CIN EXTRACTION_OPERATOR IDENTIFIER ';'
     ;
 
 assignment_statement:
@@ -113,6 +137,11 @@ method_call_statement:
     method_invocation SEMICOLON
     ;
 
+stream_statement:
+    STREAM object_chain INSERTION expression ENDL SEMICOLON
+    | STREAM expression INSERTION ENDL SEMICOLON
+    ;
+
 method_invocation:
     object_chain DOT IDENTIFIER LPAREN argument_list RPAREN
     | IDENTIFIER LPAREN argument_list RPAREN
@@ -121,12 +150,11 @@ method_invocation:
 object_chain:
     IDENTIFIER
     | object_chain DOT IDENTIFIER
-    | object_chain SCOPE IDENTIFIER
     ;
 
 argument_list:
     argument_list COMMA expression
-    | expression | method_invocation
+    | expression
     | /* empty */
     ;
 
@@ -157,53 +185,53 @@ continue_statement:
     ;
 
 expression:
-    expression PLUS expression
-    | expression MINUS expression
-    | expression MULT expression
-    | expression DIV expression
-    | expression MOD expression
-    | expression GT expression
-    | expression LT expression
-    | expression GTE expression
-    | expression LTE expression
-    | expression EQ expression
-    | expression NEQ expression
-    | expression AND expression
-    | expression OR expression
-    | NOT expression
-    | LPAREN expression RPAREN
-    | IDENTIFIER
-    | NUMBER
-    | FLOAT_LITERAL
-    | STRING_LITERAL
-    | CHAR_LITERAL
+    expression PLUS expression         /* Addition */
+    | expression MINUS expression      /* Subtraction */
+    | expression MULT expression       /* Multiplication */
+    | expression DIV expression        /* Division */
+    | expression MOD expression        /* Modulus */
+    | expression GT expression         /* Greater Than */
+    | expression LT expression         /* Less Than */
+    | expression GTE expression        /* Greater Than or Equal To */
+    | expression LTE expression        /* Less Than or Equal To */
+    | expression EQ expression         /* Equal To */
+    | expression NEQ expression        /* Not Equal To */
+    | expression AND expression        /* Logical AND */
+    | expression OR expression         /* Logical OR */
+    | NOT expression                   /* Logical NOT */
+    | MINUS expression %prec UMINUS    /* Unary minus (e.g., -x) */
+    | LPAREN expression RPAREN         /* Parenthesized expressions */
+    | IDENTIFIER LPAREN arg_list RPAREN /* Function calls */
+    | IDENTIFIER LBRACKET expression RBRACKET /* Array indexing */
+    | IDENTIFIER                      /* Variable */
+    | NUMBER                          /* Integer literal */
+    | FLOAT_LITERAL                   /* Float literal */
+    | STRING_LITERAL                  /* String literal */
+    | CHAR_LITERAL                    /* Character literal */
     ;
 
+/* Argument list for function calls */
+arg_list:
+    expression                        /* Single argument */
+    | arg_list COMMA expression       /* Multiple arguments */
+    | /* Empty argument list */
+    ;
 %%
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Syntax Error: %s at line %d\n", s, yylineno);
+    std::cerr << "Syntax Error: " << s << " at line " << yylineno << std::endl;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s <Main.cpp>\n", argv[0]);
-        return 1;
-    }
-
-    FILE *input_file = fopen(argv[1], "r");
+int main(int argc, char** argv) {
+    FILE* input_file = fopen("input_file.txt", "r");
     if (!input_file) {
         perror("Error opening file");
         return 1;
     }
-
     yyin = input_file;
 
-    printf("C++ Compiler - Parsing Started\n");
-    if (yyparse() == 0) {
-        printf("Parsing Completed Successfully\n");
-    } else {
-        printf("Parsing Failed\n");
+    if (yyparse() == 0) { // yyparse() returns 0 if parsing is successful
+        std::cout << "Parsing completed successfully!" << std::endl;
     }
 
     fclose(input_file);
