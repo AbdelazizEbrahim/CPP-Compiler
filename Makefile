@@ -1,35 +1,29 @@
 # Compiler and flags
-CC = g++
-CFLAGS = -g -Wall
-LEX = flex
+CC = gcc
+FLEX = flex
 BISON = bison
-BISONFLAGS = -d
+CFLAGS = -Wall -g
+LDFLAGS = -lfl
 
 # Files
-LEX_FILE = lexer.l
-PARSER_FILE = parser.y
-LEX_OUTPUT = lex.yy.c
-PARSER_OUTPUT_C = parser.tab.c
-PARSER_OUTPUT_H = parser.tab.h
-EXECUTABLE = compiler
+LEXER = lexer.l
+PARSER = parser.y
+LEXER_C = lexer.c
+PARSER_C = parser.c
+PARSER_H = parser.h
+EXECUTABLE = parser
 
 # Targets
 all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(LEX_OUTPUT) $(PARSER_OUTPUT_C) $(PARSER_OUTPUT_H)
-	$(CC) $(CFLAGS) $(LEX_OUTPUT) $(PARSER_OUTPUT_C) -o $(EXECUTABLE) -lfl
+$(EXECUTABLE): $(LEXER_C) $(PARSER_C)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE) $(PARSER_C) $(LEXER_C) $(LDFLAGS)
 
-$(LEX_OUTPUT): $(LEX_FILE)
-	$(LEX) $(LEX_FILE)
+$(LEXER_C): $(LEXER) $(PARSER_H)
+	$(FLEX) -o $(LEXER_C) $(LEXER)
 
-$(PARSER_OUTPUT_C) $(PARSER_OUTPUT_H): $(PARSER_FILE)
-	$(BISON) $(BISONFLAGS) $(PARSER_FILE)
+$(PARSER_C) $(PARSER_H): $(PARSER)
+	$(BISON) -d -o $(PARSER_C) $(PARSER)
 
 clean:
-	rm -f $(LEX_OUTPUT) $(PARSER_OUTPUT_C) $(PARSER_OUTPUT_H) $(EXECUTABLE)
-
-# Optional: Add a run command to test the program
-run: $(EXECUTABLE)
-	./$(EXECUTABLE) input.cpp
-
-.PHONY: all clean run
+	rm -f $(LEXER_C) $(PARSER_C) $(PARSER_H) $(EXECUTABLE)
