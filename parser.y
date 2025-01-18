@@ -29,8 +29,11 @@ int yylex();
 %right NOT
 
 %%
+
 program:
-    INT MAIN LPAREN RPAREN LBRACE statements RBRACE
+    function_declaration
+    | type MAIN LPAREN RPAREN LBRACE statements RBRACE program
+    | 
     ;
 
 statements:
@@ -49,6 +52,7 @@ statement:
     | while_loop
     | do_while_loop
     | RETURN expression SEMICOLON
+    | function_call_statement
     ;
 
 variable_declaration:
@@ -107,6 +111,8 @@ expression:
     | FLOAT_LITERAL
     | STRING_LITERAL
     | CHAR_LITERAL
+    | IDENTIFIER LPAREN argument_list RPAREN
+
     ;
 
 type:
@@ -158,10 +164,41 @@ case_label:
     | STRING_LITERAL
     ;
 
-
 default_statement:
     DEFAULT COLON statements
     | /* empty */
+    ;
+
+function_declaration:
+    type IDENTIFIER LPAREN parameters RPAREN LBRACE statements RBRACE
+    | type IDENTIFIER LPAREN parameters RPAREN SEMICOLON
+;
+
+parameters:
+    parameter_list
+    | /* empty */
+;
+
+parameter_list:
+    parameter
+    | parameter_list COMMA parameter
+;
+
+parameter:
+    type IDENTIFIER
+;
+
+function_call_statement:
+    IDENTIFIER LPAREN argument_list RPAREN SEMICOLON
+;
+
+argument_list:
+    argument
+    | argument_list COMMA argument
+    ;
+
+argument:
+    expression
     ;
 
 %%
@@ -171,11 +208,10 @@ void yyerror(const char *s) {
 }
 
 int main() {
-    if (yyparse() == 0) {  // 0 means successful parse
+    if (yyparse() == 0) { 
         printf("Parsing completed successfully.\n");
     } else {
         printf("Parsing failed.\n");
     }
     return 0;
 }
-
