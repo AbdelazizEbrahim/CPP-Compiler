@@ -1,6 +1,8 @@
+int main() {
+    int num1 = 5, num2 = 10;
 
-int main()
-{
-    std::cout << "Hello, World!" << std::endl;
+    // Printing the result
+    std::cout << "The sum of " << num1 << " and " << num2 << " is " << std::endl;
+
     return 0;
 }

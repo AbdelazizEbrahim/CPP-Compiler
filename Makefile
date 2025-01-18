@@ -2,28 +2,38 @@
 CC = gcc
 FLEX = flex
 BISON = bison
-CFLAGS = -Wall -g
-LDFLAGS = -lfl
+CFLAGS = -lfl
 
-# Files
-LEXER = lexer.l
-PARSER = parser.y
-LEXER_C = lexer.c
-PARSER_C = parser.c
-PARSER_H = parser.h
+# Source files
+LEX_FILE = lexer.l
+BISON_FILE = parser.y
+LEX_OUT = lex.yy.c
+BISON_OUT = parser.tab.c
 EXECUTABLE = parser
 
-# Targets
-all: $(EXECUTABLE)
+# Default rule: build and run
+all: build run
 
-$(EXECUTABLE): $(LEXER_C) $(PARSER_C)
-	$(CC) $(CFLAGS) -o $(EXECUTABLE) $(PARSER_C) $(LEXER_C) $(LDFLAGS)
+# Rule to build lexer and parser
+build: $(LEX_OUT) $(BISON_OUT)
+	$(CC) $(BISON_OUT) $(LEX_OUT) -o $(EXECUTABLE) $(CFLAGS)
 
-$(LEXER_C): $(LEXER) $(PARSER_H)
-	$(FLEX) -o $(LEXER_C) $(LEXER)
+# Rule to generate lex.yy.c
+$(LEX_OUT): $(LEX_FILE)
+	$(FLEX) $(LEX_FILE)
 
-$(PARSER_C) $(PARSER_H): $(PARSER)
-	$(BISON) -d -o $(PARSER_C) $(PARSER)
+# Rule to generate parser.tab.c (and parser.tab.h if needed)
+$(BISON_OUT): $(BISON_FILE)
+	$(BISON) -d $(BISON_FILE)
 
+# Rule to run the parser with input
+run:
+	@echo "Running the parser..."
+	./$(EXECUTABLE) < main.cpp
+
+# Clean up generated files
 clean:
-	rm -f $(LEXER_C) $(PARSER_C) $(PARSER_H) $(EXECUTABLE)
+	rm -f $(LEX_OUT) $(BISON_OUT) parser.tab.h $(EXECUTABLE)
+
+# Phony targets
+.PHONY: all build run clean
