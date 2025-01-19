@@ -10,6 +10,7 @@
 "boolean"            { printf("Token: BOOLEAN\n"); return BOOLEAN; }
 "char"               { printf("Token: CHAR\n"); return CHAR; }
 "String"             { printf("Token: STRING\n"); return STRING; }
+"std::string"        { printf("Token: STD STRING\n"); return STDSTRING; }
 "void"               { printf("Token: VOID\n"); return VOID; }
 
 "if"                 { printf("Token: IF\n"); return IF; }

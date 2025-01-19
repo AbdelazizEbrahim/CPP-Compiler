@@ -10,10 +10,10 @@ void yyerror(const char *s);
 int yylex();
 %}
 
-%token INT FLOAT DOUBLE BOOLEAN CHAR STRING VOID
+%token INT FLOAT DOUBLE BOOLEAN CHAR STRING STDSTRING VOID
 %token IF ELSE WHILE FOR BREAK CONTINUE RETURN DO
 %token TRY CATCH CLASS PUBLIC PRIVATE PROTECTED NEW STATIC
-%token IDENTIFIER NUMBER FLOAT_LITERAL STRING_LITERAL CHAR_LITERAL
+%token IDENTIFIER NUMBER STRING_LITERAL CHAR_LITERAL
 %token PLUS MINUS MULT DIV MOD ERROR
 %token EQ NEQ GT LT GTE LTE ASSIGN DEFAULT CASE SWITCH CIN
 %token AND OR NOT
@@ -31,10 +31,12 @@ int yylex();
 %%
 
 program:
-    function_declaration
-    | type MAIN LPAREN RPAREN LBRACE statements RBRACE program
-    | 
-    ;
+    function_declarations main_function additional_function_declarations
+;
+
+main_function:
+    type MAIN LPAREN RPAREN LBRACE statements RBRACE
+;
 
 statements:
     statement
@@ -56,12 +58,18 @@ statement:
     ;
 
 variable_declaration:
-    type IDENTIFIER SEMICOLON
-    | type IDENTIFIER ASSIGN expression SEMICOLON
+    type variable_list SEMICOLON
+    | type variable_list ASSIGN expression SEMICOLON
+    ;
+
+variable_list:
+    IDENTIFIER
+    | variable_list COMMA IDENTIFIER
     ;
 
 assignment:
     IDENTIFIER ASSIGN expression SEMICOLON
+    | IDENTIFIER PLUS ASSIGN expression SEMICOLON
     ;
 
 if_statement:
@@ -87,32 +95,34 @@ do_while_loop:
 
 optional_expression:
     expression
-    | /* empty */
+    | 
     ;
 
 expression:
-    expression PLUS expression
-    | expression MINUS expression
-    | expression MULT expression
-    | expression DIV expression
-    | expression MOD expression
-    | expression GT expression
-    | expression LT expression
-    | expression GTE expression
-    | expression LTE expression
-    | expression EQ expression
-    | expression NEQ expression
-    | expression AND expression
-    | expression OR expression
+    expression binary_operator expression
     | NOT expression
     | LPAREN expression RPAREN
     | IDENTIFIER
+    | type IDENTIFIER ASSIGN expression
+    | IDENTIFIER ASSIGN expression
     | NUMBER
-    | FLOAT_LITERAL
+    | float_literal
     | STRING_LITERAL
     | CHAR_LITERAL
     | IDENTIFIER LPAREN argument_list RPAREN
+    ;
 
+float_literal:
+    digits DOT digits   
+    ;
+
+digits:
+    NUMBER  
+    ;
+
+
+binary_operator:
+    PLUS | MINUS | MULT | DIV | MOD | GT | LT | GTE | LTE | EQ | NEQ | AND | OR
     ;
 
 type:
@@ -166,8 +176,20 @@ case_label:
 
 default_statement:
     DEFAULT COLON statements
-    | /* empty */
+    | 
     ;
+
+function_declarations:
+    function_declaration
+    | function_declarations function_declaration
+    | 
+;
+
+additional_function_declarations:
+    function_declaration
+    | additional_function_declarations function_declaration
+    | 
+;
 
 function_declaration:
     type IDENTIFIER LPAREN parameters RPAREN LBRACE statements RBRACE
@@ -176,7 +198,7 @@ function_declaration:
 
 parameters:
     parameter_list
-    | /* empty */
+    | 
 ;
 
 parameter_list:
@@ -195,11 +217,11 @@ function_call_statement:
 argument_list:
     argument
     | argument_list COMMA argument
-    ;
+;
 
 argument:
     expression
-    ;
+;
 
 %%
 
