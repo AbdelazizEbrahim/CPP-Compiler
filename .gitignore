@@ -4,3 +4,9 @@ y.output
 *.h
 compiler
 .vscode
+lexer.yy.c
+parser
+parser.tab.c
+parser.tab.h
+
+
