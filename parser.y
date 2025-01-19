@@ -17,7 +17,7 @@ int yylex();
 %token INCREMENT DECREMENT PLUS MINUS MULT DIV MOD ERROR 
 %token EQ NEQ GT LT GTE LTE ASSIGN DEFAULT CASE SWITCH CIN
 %token AND OR NOT
-%token SEMICOLON COLON COMMA DOT LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET
+%token SEMICOLON COLON COMMA DOT LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET HASH
 %token MAIN STD SCOPE COUT LSHIFT ENDL RSHIFT
 
 %left OR
@@ -31,9 +31,22 @@ int yylex();
 %%
 
 program:
+    includes main_program
+    ;
+
+includes:
+    includes include_statement
+    | include_statement
+    ;
+
+include_statement:
+    HASH IDENTIFIER LT IDENTIFIER GT
+    ;
+
+main_program:
     main_function
     | function_declarations main_function additional_function_declarations
-;
+    ;
 
 main_function:
     type MAIN LPAREN RPAREN LBRACE statements RBRACE
@@ -60,6 +73,7 @@ statement:
     | DECREMENT IDENTIFIER SEMICOLON
     | IDENTIFIER INCREMENT SEMICOLON
     | IDENTIFIER DECREMENT SEMICOLON
+    | includes
     ;
 
 variable_declaration:

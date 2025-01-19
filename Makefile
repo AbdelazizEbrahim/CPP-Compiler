@@ -1,8 +1,8 @@
 # Compiler and flags
-CC = gcc
+CC = g++
 FLEX = flex
 BISON = bison
-CFLAGS = -lfl
+CFLAGS = -lfl -std=c++11
 
 # Source files
 LEX_FILE = lexer.l

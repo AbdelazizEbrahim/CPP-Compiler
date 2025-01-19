@@ -1,9 +1,12 @@
 %{
 #include "parser.tab.h"
 #include <stdio.h>
+#include <iostream>
 %}
 
 %%
+
+
 "int"                { printf("Token: INT\n"); return INT; }
 "float"              { printf("Token: FLOAT\n"); return FLOAT; }
 "double"             { printf("Token: DOUBLE\n"); return DOUBLE; }
@@ -71,11 +74,15 @@
 "("                  { printf("Token: LPAREN\n"); return LPAREN; }
 ")"                  { printf("Token: RPAREN\n"); return RPAREN; }
 "."                  { printf("Token: DOT\n"); return DOT; }
+"#"                  { printf("Token: HASH\n"); return HASH; }
+
 
 [ \t\n\r]+           { /* Ignore whitespace */ }
+
 "^#include[ \t]+"[^ \t\n]+ { /* Skip this token */ }
+
 "//".*               { /* Ignore single-line comments */ }
-"/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+"/" {} // Multi-line comments
+"/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+"/" {}
 
 .                    { printf("Unknown token: %s\n", yytext); return ERROR; }
 

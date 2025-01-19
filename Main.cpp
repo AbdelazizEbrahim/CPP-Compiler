@@ -1,3 +1,5 @@
+#include <iostream>
+
 // Function declarations
 void arithmeticOperations(int a, int b, char op);
 void evaluateConditions(int x);
