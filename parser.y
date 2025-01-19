@@ -14,7 +14,7 @@ int yylex();
 %token IF ELSE WHILE FOR BREAK CONTINUE RETURN DO
 %token TRY CATCH CLASS PUBLIC PRIVATE PROTECTED NEW STATIC
 %token IDENTIFIER NUMBER STRING_LITERAL CHAR_LITERAL
-%token PLUS MINUS MULT DIV MOD ERROR
+%token INCREMENT DECREMENT PLUS MINUS MULT DIV MOD ERROR 
 %token EQ NEQ GT LT GTE LTE ASSIGN DEFAULT CASE SWITCH CIN
 %token AND OR NOT
 %token SEMICOLON COLON COMMA DOT LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET
@@ -56,6 +56,10 @@ statement:
     | do_while_loop
     | RETURN expression SEMICOLON
     | function_call_statement
+    | INCREMENT IDENTIFIER SEMICOLON
+    | DECREMENT IDENTIFIER SEMICOLON
+    | IDENTIFIER INCREMENT SEMICOLON
+    | IDENTIFIER DECREMENT SEMICOLON
     ;
 
 variable_declaration:
@@ -71,15 +75,20 @@ variable_list:
 assignment:
     IDENTIFIER ASSIGN expression SEMICOLON
     | IDENTIFIER PLUS ASSIGN expression SEMICOLON
+    | IDENTIFIER MINUS ASSIGN expression SEMICOLON
     ;
 
+
 if_statement:
-    IF LPAREN expression RPAREN LBRACE statements RBRACE optional_else
+    IF LPAREN expression RPAREN statement optional_else
+    | IF LPAREN expression RPAREN LBRACE statements RBRACE optional_else
     ;
 
 optional_else:
-    ELSE LBRACE statements RBRACE
-    | /* empty */
+    ELSE if_statement
+    | ELSE LBRACE statements RBRACE
+    | ELSE statement
+    | 
     ;
 
 for_loop:
@@ -111,7 +120,12 @@ expression:
     | STRING_LITERAL
     | CHAR_LITERAL
     | IDENTIFIER LPAREN argument_list RPAREN
+    | INCREMENT IDENTIFIER  
+    | DECREMENT IDENTIFIER  
+    | IDENTIFIER INCREMENT 
+    | IDENTIFIER DECREMENT 
     ;
+
 
 float_literal:
     digits DOT digits   
@@ -127,7 +141,7 @@ binary_operator:
     ;
 
 type:
-    INT | FLOAT | DOUBLE | BOOLEAN | CHAR | STRING | VOID
+    INT | FLOAT | DOUBLE | BOOLEAN | CHAR | STRING | VOID | STDSTRING
     ;
 
 print_statement:
@@ -148,7 +162,12 @@ output_value:
     ;
 
 cin_statement:
-    STD SCOPE CIN RSHIFT IDENTIFIER SEMICOLON
+    STD SCOPE CIN cin_inputs SEMICOLON
+    ;
+
+cin_inputs:
+    RSHIFT IDENTIFIER
+    | cin_inputs RSHIFT IDENTIFIER
     ;
 
 switch_statement:
@@ -218,6 +237,7 @@ function_call_statement:
 argument_list:
     argument
     | argument_list COMMA argument
+    |
 ;
 
 argument:

@@ -35,6 +35,8 @@
 "::"                 { printf("Token: SCOPE\n"); return SCOPE; }
 "="                  { printf("Token: ASSIGN\n"); return ASSIGN; }
 "+"                  { printf("Token: PLUS\n"); return PLUS; }
+"++"                 { printf("Token: INCREMENT\n"); return INCREMENT; }
+"--"                 { printf("Token: DECREMENT\n"); return DECREMENT; }
 "-"                  { printf("Token: MINUS\n"); return MINUS; }
 "*"                  { printf("Token: MULT\n"); return MULT; }
 "/"                  { printf("Token: DIV\n"); return DIV; }
@@ -71,6 +73,7 @@
 "."                  { printf("Token: DOT\n"); return DOT; }
 
 [ \t\n\r]+           { /* Ignore whitespace */ }
+"^#include[ \t]+"[^ \t\n]+ { /* Skip this token */ }
 "//".*               { /* Ignore single-line comments */ }
 "/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+"/" {} // Multi-line comments
 
