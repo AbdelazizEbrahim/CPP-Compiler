@@ -31,7 +31,8 @@ int yylex();
 %%
 
 program:
-    function_declarations main_function additional_function_declarations
+    main_function
+    | function_declarations main_function additional_function_declarations
 ;
 
 main_function:
