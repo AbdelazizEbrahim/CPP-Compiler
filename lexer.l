@@ -8,6 +8,7 @@
 
 
 "int"                { printf("Token: INT\n"); return INT; }
+"const"              { printf("Token: CONST\n"); return CONST; }
 "float"              { printf("Token: FLOAT\n"); return FLOAT; }
 "double"             { printf("Token: DOUBLE\n"); return DOUBLE; }
 "boolean"            { printf("Token: BOOLEAN\n"); return BOOLEAN; }

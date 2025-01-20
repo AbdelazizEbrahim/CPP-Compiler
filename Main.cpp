@@ -1,107 +1,84 @@
 #include <iostream>
+#include <cmath> // For mathematical functions like sqrt and pow
 
 // Function declarations
-void arithmeticOperations(int a, int b, char op);
-void evaluateConditions(int x);
-void nestedLoopsAndLogic();
+int add(int a, int b);
+int subtract(int a, int b);
+void demonstrateSwitch(int option);
 
 int main() {
-    std::cout << "Welcome to the C++ Program Demonstrating Everything!" << std::endl;
+    // Basic mathematical operations
+    int a = 10, b = 20;
+    std::cout << "Addition: " << a + b << std::endl;
+    std::cout << "Subtraction: " << a - b << std::endl;
+    std::cout << "Multiplication: " << a * b << std::endl;
+    std::cout << "Division: " << b / a << std::endl;
+    std::cout << "Modulus: " << b % a << std::endl;
+    std::cout << "Power: " << pow(a, 2) << std::endl;
+    std::cout << "Square Root: " << sqrt(b) << std::endl;
 
-    // Taking input for arithmetic operations
-    int num1, num2;
-    char operation;
-    std::cout << "Enter two numbers: ";
-    std::cin >> num1 >> num2;
-    std::cout << "Enter an operation (+, -, *, /, %): ";
-    std::cin >> operation;
+    // Increment and decrement
+    std::cout << "Increment a: " << ++a << std::endl; // Pre-increment
+    std::cout << "Decrement b: " << --b << std::endl; // Pre-decrement
 
-    // Call arithmeticOperations function
-    arithmeticOperations(num1, num2, operation);
+    // Conditional statements
+    if (a > b) {
+        std::cout << "a is greater than b" << std::endl;
+    } else if (a < b) {
+        std::cout << "a is less than b" << std::endl;
+    } else {
+        std::cout << "a is equal to b" << std::endl;
+    }
 
-    // Taking input to evaluate conditions
-    int value;
-    std::cout << "Enter a number to evaluate conditions: ";
-    std::cin >> value;
+    // Switch statement
+    demonstrateSwitch(2);
 
-    // Call evaluateConditions function
-    evaluateConditions(value);
+    // Nested statements
+    for (int i = 0; i < 3; ++i) {
+        std::cout << "Outer loop iteration: " << i << std::endl;
+        for (int j = 0; j < 2; ++j) {
+            std::cout << "  Inner loop iteration: " << j << std::endl;
 
-    // Call nestedLoopsAndLogic function
-    nestedLoopsAndLogic();
+            if (i == j) {
+                std::cout << "    i equals j at " << i << std::endl;
+            }
+        }
+    }
+
+    // Function calls
+    int sum = add(5, 15);
+    int diff = subtract(30, 10);
+    printMessage("The sum is: " + sum);
+    printMessage("The difference is: " + diff);
 
     return 0;
 }
 
-// Function to demonstrate arithmetic operations with switch-case
-void arithmeticOperations(int a, int b, char op) {
-    std::cout << "\nPerforming arithmetic operation..." << std::endl;
-    switch (op) {
-        case '+':
-            std::cout << "Result: " << a + b << std::endl;
+// Function definitions
+void printMessage(const hello) {
+    std::cout << message << std::endl;
+}
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}
+
+void demonstrateSwitch(int option) {
+    switch (option) {
+        case 1:
+            std::cout << "Option 1 selected" << std::endl;
             break;
-        case '-':
-            std::cout << "Result: " << a - b << std::endl;
+        case 2:
+            std::cout << "Option 2 selected" << std::endl;
             break;
-        case '*':
-            std::cout << "Result: " << a * b << std::endl;
-            break;
-        case '/':
-            if (b != 0)
-                std::cout << "Result: " << a / b << std::endl;
-            else
-                std::cout << "Error: Division by zero is not allowed." << std::endl;
-            break;
-        case '%':
-            if (b != 0)
-                std::cout << "Result: " << a % b << std::endl;
-            else
-                std::cout << "Error: Modulo by zero is not allowed." << std::endl;
+        case 3:
+            std::cout << "Option 3 selected" << std::endl;
             break;
         default:
-            std::cout << "Invalid operation entered." << std::endl;
-    }
-}
-
-// Function to demonstrate conditionals and operator precedence
-void evaluateConditions(int x) {
-    std::cout << "\nEvaluating conditions..." << std::endl;
-    if (x % 2 == 0 && x > 0) {
-        std::cout << "The number is positive and even." << std::endl;
-    } else if (x % 2 != 0 && x > 0) {
-        std::cout << "The number is positive and odd." << std::endl;
-    } else if (x < 0) {
-        std::cout << "The number is negative." << std::endl;
-    } else {
-        std::cout << "The number is zero." << std::endl;
-    }
-}
-
-// Function to demonstrate nested loops and logic
-void nestedLoopsAndLogic() {
-    std::cout << "\nDemonstrating nested loops and logic..." << std::endl;
-
-    for (int i = 1; i <= 2; i++) {
-        std::cout << "Outer for loop: i = " << i << std::endl;
-        for (int j = 1; j <= 2; j++) {
-            std::cout << "  Inner for loop: j = " << j << std::endl;
-
-            int k = 1;
-            while (k <= 2) {
-                std::cout << "    While loop: k = " << k << std::endl;
-
-                int l = 1;
-                while (l <= 2) {
-                    std::cout << "      Nested while loop: l = " << l << std::endl;
-                    if (l == k) {
-                        std::cout << "        l is equal to k!" << std::endl;
-                    } else {
-                        std::cout << "        l is not equal to k!" << std::endl;
-                    }
-                    l++;
-                }
-                k++;
-            }
-        }
+            std::cout << "Invalid option selected" << std::endl;
     }
 }

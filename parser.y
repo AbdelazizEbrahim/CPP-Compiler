@@ -10,7 +10,7 @@ void yyerror(const char *s);
 int yylex();
 %}
 
-%token INT FLOAT DOUBLE BOOLEAN CHAR STRING STDSTRING VOID
+%token INT FLOAT DOUBLE BOOLEAN CHAR STRING STDSTRING VOID CONST
 %token IF ELSE WHILE FOR BREAK CONTINUE RETURN DO
 %token TRY CATCH CLASS PUBLIC PRIVATE PROTECTED NEW STATIC
 %token IDENTIFIER NUMBER STRING_LITERAL CHAR_LITERAL
@@ -77,13 +77,17 @@ statement:
     ;
 
 variable_declaration:
-    type variable_list SEMICOLON
-    | type variable_list ASSIGN expression SEMICOLON
+    type variable_initializations SEMICOLON
     ;
 
-variable_list:
+variable_initializations:
+    variable_initialization
+    | variable_initializations COMMA variable_initialization
+    ;
+
+variable_initialization:
     IDENTIFIER
-    | variable_list COMMA IDENTIFIER
+    | IDENTIFIER ASSIGN expression
     ;
 
 assignment:
@@ -140,7 +144,6 @@ expression:
     | IDENTIFIER DECREMENT 
     ;
 
-
 float_literal:
     digits DOT digits   
     ;
@@ -149,13 +152,12 @@ digits:
     NUMBER  
     ;
 
-
 binary_operator:
     PLUS | MINUS | MULT | DIV | MOD | GT | LT | GTE | LTE | EQ | NEQ | AND | OR
     ;
 
 type:
-    INT | FLOAT | DOUBLE | BOOLEAN | CHAR | STRING | VOID | STDSTRING
+    INT | FLOAT | DOUBLE | BOOLEAN | CHAR | STRING | VOID | STDSTRING | CONST
     ;
 
 print_statement:
