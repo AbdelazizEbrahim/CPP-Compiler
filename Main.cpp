@@ -1,10 +1,12 @@
 #include <iostream>
 #include <cmath> // For mathematical functions like sqrt and pow
+#include <string>
 
 // Function declarations
 int add(int a, int b);
 int subtract(int a, int b);
 void demonstrateSwitch(int option);
+void printMessage(const std::string& message);
 
 int main() {
     // Basic mathematical operations
@@ -48,14 +50,14 @@ int main() {
     // Function calls
     int sum = add(5, 15);
     int diff = subtract(30, 10);
-    printMessage("The sum is: " + sum);
-    printMessage("The difference is: " + diff);
+    printMessage("The sum is: " + std::to_string(sum));
+    printMessage("The difference is: " + std::to_string(diff));
 
     return 0;
 }
 
 // Function definitions
-void printMessage(const hello) {
+void printMessage(const std::string& message) {
     std::cout << message << std::endl;
 }
 

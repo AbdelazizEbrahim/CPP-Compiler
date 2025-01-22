@@ -1,6 +1,8 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "semantic_analysis.h" // Include the semantic analysis header
+#include "symbol_table.h" // Include the symbol table header
 
 extern int yylineno;
 extern int yylval;
@@ -8,6 +10,9 @@ extern FILE *yyin;
 
 void yyerror(const char *s);
 int yylex();
+
+// Declare an instance of SemanticAnalysis
+SemanticAnalysis semanticAnalysis;
 %}
 
 %token INT FLOAT DOUBLE BOOLEAN CHAR STRING STDSTRING VOID CONST
@@ -30,6 +35,7 @@ int yylex();
 
 %%
 
+// Grammar rules
 program:
     includes main_program
     ;
@@ -45,7 +51,7 @@ include_statement:
 
 main_program:
     main_function
-    | function_declarations main_function additional_function_declarations
+    | function_declarations main_function function_declarations
     ;
 
 main_function:
@@ -67,7 +73,9 @@ statement:
     | for_loop
     | while_loop
     | do_while_loop
-    | RETURN expression SEMICOLON
+    | RETURN expression SEMICOLON {
+        semanticAnalysis.checkReturnType(std::to_string($2));
+    }
     | function_call_statement
     | INCREMENT IDENTIFIER SEMICOLON
     | DECREMENT IDENTIFIER SEMICOLON
@@ -77,7 +85,9 @@ statement:
     ;
 
 variable_declaration:
-    type variable_initializations SEMICOLON
+    type variable_initializations SEMICOLON {
+        semanticAnalysis.checkVariableDeclaration(std::to_string($2), std::to_string($1));
+    }
     ;
 
 variable_initializations:
@@ -91,11 +101,16 @@ variable_initialization:
     ;
 
 assignment:
-    IDENTIFIER ASSIGN expression SEMICOLON
-    | IDENTIFIER PLUS ASSIGN expression SEMICOLON
-    | IDENTIFIER MINUS ASSIGN expression SEMICOLON
+    IDENTIFIER ASSIGN expression SEMICOLON {
+        semanticAnalysis.checkVariableUsage(std::to_string($1));
+    }
+    | IDENTIFIER PLUS ASSIGN expression SEMICOLON {
+        semanticAnalysis.checkVariableUsage(std::to_string($1));
+    }
+    | IDENTIFIER MINUS ASSIGN expression SEMICOLON {
+        semanticAnalysis.checkVariableUsage(std::to_string($1));
+    }
     ;
-
 
 if_statement:
     IF LPAREN expression RPAREN statement optional_else
@@ -247,8 +262,10 @@ parameter:
 ;
 
 function_call_statement:
-    IDENTIFIER LPAREN argument_list RPAREN SEMICOLON
-;
+    IDENTIFIER LPAREN argument_list RPAREN SEMICOLON {
+        semanticAnalysis.checkFunctionCall(std::to_string($1));
+    }
+    ;
 
 argument_list:
     argument
@@ -266,11 +283,3 @@ void yyerror(const char *s) {
     fprintf(stderr, "Error: %s at line %d\n", s, yylineno);
 }
 
-int main() {
-    if (yyparse() == 0) { 
-        printf("Parsing completed successfully.\n");
-    } else {
-        printf("Parsing failed.\n");
-    }
-    return 0;
-}
