@@ -126,7 +126,7 @@ variable_declaration:
                 YYABORT;
             }
             // Check type consistency between variable type and expression type
-            if (!semantic_check_type($1, $4)) {
+            if (semantic_check_type($1, $4)) {
                 yyerror("Type mismatch in initialization");
                 // Free all allocated memory and exit
                 for (int j = 0; j < vars->count; j++) {

@@ -8,7 +8,7 @@ int divide(int x, int y);
 int main()
 {
     // Basic variable initialization
-    int a = "8";
+    int a = "5";
     int b = 4;
 
     // Performing arithmetic operations

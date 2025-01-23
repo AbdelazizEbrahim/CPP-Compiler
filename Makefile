@@ -1,39 +1,34 @@
+# Makefile for building the C++ compiler
+
 # Compiler and flags
-CC = g++
-FLEX = flex
-BISON = bison
-CFLAGS = -lfl -std=c++11
+CC = gcc
+CFLAGS = -Wall -g
 
-# Source files
-LEX_FILE = lexer.l
-BISON_FILE = parser.y
-LEX_OUT = lex.yy.c
-BISON_OUT = parser.tab.c
-EXECUTABLE = parser
+# Files
+LEXER = lexer.l
+PARSER = parser.y
+SEMANTIC = semantic.c
+EXECUTABLE = compiler
 
-# Default rule: build and run
-all: build run
+# Generated files
+LEXER_OUTPUT = lex.yy.c
+PARSER_OUTPUT = parser.tab.c
+PARSER_HEADER = parser.tab.h
 
-# Rule to build lexer and parser
-build: $(LEX_OUT) $(BISON_OUT)
-	$(CC) $(BISON_OUT) $(LEX_OUT) -o $(EXECUTABLE) $(CFLAGS)
+# Targets
+all: $(EXECUTABLE)
 
-# Rule to generate lex.yy.c
-$(LEX_OUT): $(LEX_FILE)
-	$(FLEX) $(LEX_FILE)
+$(EXECUTABLE): $(LEXER_OUTPUT) $(PARSER_OUTPUT) $(SEMANTIC)
+	$(CC) $(CFLAGS) -o $@ $(LEXER_OUTPUT) $(PARSER_OUTPUT) $(SEMANTIC) -ll
 
-# Rule to generate parser.tab.c (and parser.tab.h if needed)
-$(BISON_OUT): $(BISON_FILE)
-	$(BISON) -d $(BISON_FILE)
+$(LEXER_OUTPUT): $(LEXER)
+	flex $<
 
-# Rule to run the parser with input
-run:
-	@echo "Running the parser..."
-	./$(EXECUTABLE) < main.cpp
+$(PARSER_OUTPUT): $(PARSER)
+	bison -d $<
 
-# Clean up generated files
 clean:
-	rm -f $(LEX_OUT) $(BISON_OUT) parser.tab.h $(EXECUTABLE)
+	rm -f $(EXECUTABLE) $(LEXER_OUTPUT) $(PARSER_OUTPUT) $(PARSER_HEADER)
 
 # Phony targets
-.PHONY: all build run clean
+.PHONY: all clean
